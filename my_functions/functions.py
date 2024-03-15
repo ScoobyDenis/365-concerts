@@ -25,6 +25,18 @@ async def check_club_state(message: types.Message):
     in_club = cursor.fetchone()[0]
     return in_club == 'да'
 
+async def check_bot_state(message: types.Message):
+    connect, cursor = connect_db(DB_NAME)
+    cursor.execute(f"SELECT bot_status FROM users WHERE user_id = {message.from_user.id}")
+    return cursor.fetchone()[0] == 'on'
+
+async def change_bot_state_to_off(user_id):
+    connect, cursor = connect_db(DB_NAME)
+    cursor.execute(f"UPDATE users SET bot_status = '{'off'}'  WHERE user_id = {user_id}")
+    connect.commit()
+    cursor.execute(f"SELECT bot_status FROM users WHERE user_id = {user_id}")
+    print(cursor.fetchone())
+
 async def delete_message(message: types.Message, delay: int):
     await asyncio.sleep(delay)
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
@@ -60,7 +72,7 @@ async def convert_db_to_csv():
         csv_writer.writerows(rows)
 async def send_message_on_time(message: types.Message, msg, seconds, second_to_del, kb=None, parse_mode=None):
     current_time = datetime.datetime.now()
-    if current_time.hour >= 8 and current_time.hour < 23:
+    if current_time.hour >= 10 and current_time.hour < 23:
         delta = datetime.timedelta(seconds=seconds) #
         send_time = current_time + delta
     else:
@@ -77,7 +89,7 @@ async def send_message_on_time(message: types.Message, msg, seconds, second_to_d
 async def send_photo_on_time(message: types.Message, photo, cap, seconds, seconds_to_del, parse_mode):
     current_time = datetime.datetime.now()
 
-    if current_time.hour >= 8 and current_time.hour < 23:
+    if current_time.hour >= 10 and current_time.hour < 23:
         delta = datetime.timedelta(seconds=seconds) #
         send_time = current_time + delta
     else:
@@ -100,7 +112,7 @@ async def send_kb_yes_no(message: types.Message):
     msg = await message.answer(f"{message.from_user.username}, у вас\n"
                                f"открылось предложение?\n",
                                reply_markup=keyboard_yes_no)
-    asyncio.create_task(delete_message(msg, 10)) # 1 час
+    asyncio.create_task(delete_message(msg, 3600)) # 1 час
 
 async def create_kb(button):
     kb = ReplyKeyboardMarkup(
