@@ -28,7 +28,8 @@ async def main():
                 mark3 INTENGER,
                 mark4 INTENGER,
                 mark5 INTENGER,
-                mark6 INTENGER)
+                mark6 INTENGER,
+                bot_status TEXT)
                 """)
     # Пропускаем накопившиеся апдейты и запускаем polling
     await bot.delete_webhook(drop_pending_updates=True)

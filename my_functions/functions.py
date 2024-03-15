@@ -6,7 +6,7 @@ import datetime
 import requests as requests
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
 
-from data_bases.connect_data_base import connect_db, DB_NAME
+from data_bases.connect_data_base import connect_db, DB_NAME, ADMINS
 from aiogram import types, Bot
 from config_data.config import Config, load_config
 from lexicon.lexicon import LEXICON_RU
@@ -50,8 +50,9 @@ async def send_message_to_user(user_id: int, message: str):
     await bot.send_message(user_id, message)
 
 async def send_msg_to_admins(message: types.Message, msg):
-    for i in ADMINS:
-        await bot.send_message(i, f'{"@" + message.from_user.username} - {msg}')
+    await bot.send_message(1372933011, f'{"@" + message.from_user.username} - {msg}')
+    await bot.send_message(1088508317, f'{"@" + message.from_user.username} - {msg}')
+    # await bot.send_message(364640169, f'{"@" + message.from_user.username} - {msg}')
 
 # Функция для отправки PDF файла
 async def send_pdf(chat_id: int, pdf_path: str, bot_token: str):
@@ -117,7 +118,8 @@ async def send_kb_yes_no(message: types.Message):
     msg = await message.answer(f"{message.from_user.username}, у вас\n"
                                f"открылось предложение?\n",
                                reply_markup=keyboard_yes_no)
-    asyncio.create_task(delete_message(msg, 3600)) # 1 час
+    asyncio.create_task(delete_message(msg, 3600/100)) # 1 час
+    asyncio.create_task(delete_message(msg, 3600/100)) # 1 час
 
 async def create_kb(button):
     kb = ReplyKeyboardMarkup(

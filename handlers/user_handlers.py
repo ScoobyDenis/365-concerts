@@ -21,7 +21,7 @@ async def cmd_start(message: types.Message):
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"SELECT * FROM users WHERE user_id = {message.from_user.id}")
     user = cursor.fetchone()
-    if user:
+    if user and message.from_user.id != 1372933011:
         pass
     else:
         await message.answer(message.from_user.first_name + ', ' + LEXICON_RU['/start'])
@@ -33,29 +33,29 @@ async def cmd_start(message: types.Message):
 
         await send_message_on_time(message,
                                    LEXICON_RU['msg2_youtube'],
-                                   300,  # 5мин
-                                   14400,  # 4 часа
+                                   300/100,  # 5мин
+                                   14400/100,  # 4 часа
                                    kb=await create_kb('Получить запись'))
 
         offer_1_pic = FSInputFile("files/offer_1.jpg")
         await send_photo_on_time(message,
                                  photo=offer_1_pic,
                                  cap=LEXICON_RU['msg3_offer'],
-                                 seconds=15000, #4часа 10мин
-                                 seconds_to_del=82800, #23 часа
+                                 seconds=15000/100, #4часа 10мин
+                                 seconds_to_del=82800/400, #23 часа
                                  parse_mode='HTML')
-        await asyncio.sleep(82800)
+        await asyncio.sleep(82800/400)
         # проверка писал ли пользователь клуб. если нет то шлем контент дальше
         if await check_club_state(message):
             pass
         else:
             await send_message_on_time(message,
                                        LEXICON_RU['msg4_youtube'],
-                                       30, # после задержки 23 часа
-                                       14400, # 4часа
+                                       30/10, # после задержки 23 часа
+                                       14400/100, # 4часа
                                        kb=await create_kb('Не хотят отдавать гонорар!😡'))
 
-            await asyncio.sleep(14400)
+            await asyncio.sleep(14400/100)
             msg_reels_rules = await message.answer(LEXICON_RU['msg5'], parse_mode='HTML')
 
 
@@ -73,12 +73,12 @@ async def send_file(message: types.Message):
     if message.from_user.id in ADMINS:
         await convert_db_to_csv()
         await message.reply_document(FSInputFile('output.csv'))
-        await message.answer("mark1 - 'Почему не готовы'"
-                             "mark2 - 'Антикидалово'"
-                             "mark3 - 'Это должен знать каждый артист'"
-                             "mark4 - 'Ошибка N1'"
-                             "mark5 - '5 ПРИЧИН'"
-                             "mark6 - 'Последний шанс'")
+        await message.answer("mark1 - 'Почему не готовы'\n"
+                             "mark2 - 'Антикидалово'\n"
+                             "mark3 - 'Это должен знать каждый артист'\n"
+                             "mark4 - 'Ошибка N1'\n"
+                             "mark5 - '5 ПРИЧИН'\n"
+                             "mark6 - 'Последний шанс'\n")
 
 @router.message(Command('bot_off'))
 async def send_file(message: types.Message):
@@ -91,7 +91,8 @@ async def send_file(message: types.Message):
             except Exception as e:
                 await message.answer("Не правильно введен id пользователя")
         except ValueError:
-            await message.answer("Пожалуйста, укажите id после команды /get_user_status\n"
+            await message.answer("Пожалуйста, укажите id после \n"
+                                 "команды /bot_off\n"
                                  "id есть в таблице /get_file")
 @router.message(Command('stats'))
 async def check_marks(message: types.Message):
@@ -126,11 +127,11 @@ async def cmd_youtube_filter1(message: types.Message):
     connect.commit()
 
     msg1_youtube_filter1 = await message.answer(f"{'https://youtu.be/8Z4aFPKMPkE'}\n")
-    await asyncio.sleep(60) #1min
+    await asyncio.sleep(60/10) #1min
     msg2_youtube_filter1 = await message.answer(LEXICON_RU['msg2_youtube_filter1'])
 
-    asyncio.create_task(delete_message(msg2_youtube_filter1, 10800)) #3часа
-    asyncio.create_task(delete_message(msg1_youtube_filter1, 14400))  # 4часа
+    asyncio.create_task(delete_message(msg2_youtube_filter1, 10800/100)) #3часа
+    asyncio.create_task(delete_message(msg1_youtube_filter1, 14400/100))  # 4часа
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 @router.message(F.text=="Не хотят отдавать гонорар!😡")
@@ -141,8 +142,8 @@ async def cmd_youtube_filter2(message: types.Message):
     msg1_youtube_filter2 = await message.answer(f"{'https://youtu.be/4Ltp7kyoZrg'}\n")
     await asyncio.sleep(5)  # сразу
     msg2_youtube_filter2 = await message.answer(LEXICON_RU['msg2_youtube_filter2'])
-    asyncio.create_task(delete_message(msg2_youtube_filter2, 10800)) #3часа
-    asyncio.create_task(delete_message(msg1_youtube_filter2, 86400))  # 24часа
+    asyncio.create_task(delete_message(msg2_youtube_filter2, 10800/100)) #3часа
+    asyncio.create_task(delete_message(msg1_youtube_filter2, 86400/100))  # 24часа
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 @router.message(F.text=='Да✅')
@@ -152,43 +153,43 @@ async def process_buttons_press_yes(message: types.Message):
     connect.commit()
 
     msg_personal_yes = await message.answer(LEXICON_RU['msg_personal'])
-    asyncio.create_task(delete_message(msg_personal_yes, 7200))  # 2 часа
-    await asyncio.sleep(7200)  # 2 часа
+    asyncio.create_task(delete_message(msg_personal_yes, 7200/100))  # 2 часа
+    await asyncio.sleep(7200/100)  # 2 часа
 
     if await check_bot_state(message):
         msg_artist_should_know = await message.answer(LEXICON_RU['msg_artist_should_know'], reply_markup=await create_kb('Получить ссылку 🔗'))
-        asyncio.create_task(delete_message(msg_artist_should_know, 21600))  # 6 часов
-        await asyncio.sleep(21605)  # 6 часов
+        asyncio.create_task(delete_message(msg_artist_should_know, 21600/100))  # 6 часов
+        await asyncio.sleep(21600/100)  # 6 часов 21605
 
     if await check_bot_state(message):
         msg_5years_more = await message.answer(LEXICON_RU['msg_5years_more'])
-        asyncio.create_task(delete_message(msg_5years_more, 3600))  # 1 часов
-        await asyncio.sleep(3605)  # 1 час
+        asyncio.create_task(delete_message(msg_5years_more, 3600/100))  # 1 часов
+        await asyncio.sleep(3600/100)  # 1 час 3605
 
     if await check_bot_state(message):
         msg_reviews = await message.answer(LEXICON_RU['msg_reviews'])
-        await asyncio.sleep(900)  # 15 мин
+        await asyncio.sleep(900/100)  # 15 мин
 
     if await check_bot_state(message):
         msg_next_offer = await message.answer(LEXICON_RU['msg_next_offer'])
-        asyncio.create_task(delete_message(msg_next_offer, 10800))  # 3 часа
-        await asyncio.sleep(10805)  # 3 часа
+        asyncio.create_task(delete_message(msg_next_offer, 10800/100))  # 3 часа
+        await asyncio.sleep(1080/100)  # 3 часа 10805
 
     if await check_bot_state(message):
         msg_error_num1_offer = await message.answer(LEXICON_RU['msg_error_num1_offer'], reply_markup=await create_kb('Присоединиться к клубу 🔥'))
-        asyncio.create_task(delete_message(msg_error_num1_offer, 21600))  # 6 часов
-        await asyncio.sleep(21605)  # 6 часов
+        asyncio.create_task(delete_message(msg_error_num1_offer, 21600/100))  # 6 часов
+        await asyncio.sleep(21600/100)  # 6 часов 21605
 
     if await check_bot_state(message):
         msg_5_reasons_1 = await message.answer(LEXICON_RU['msg_5_reasons_1'])
         msg_5_reasons_2 = await message.answer(LEXICON_RU['msg_5_reasons_2'], reply_markup=await create_kb('бронировать участие 👌'))
-        asyncio.create_task(delete_message(msg_5_reasons_1, 16200))  # 4:30 часов
-        asyncio.create_task(delete_message(msg_5_reasons_2, 16200))  # 4:30 часов
+        asyncio.create_task(delete_message(msg_5_reasons_1, 16200/100))  # 4:30 часов
+        asyncio.create_task(delete_message(msg_5_reasons_2, 16200/100))  # 4:30 часов
         await asyncio.sleep(16205)  # 5 часов
 
     if await check_bot_state(message):
         msg_last_chance = await message.answer(LEXICON_RU['msg_last_chance'], reply_markup=await create_kb('приобрести участие'))
-        asyncio.create_task(delete_message(msg_last_chance, 3540))  # 59минут
+        asyncio.create_task(delete_message(msg_last_chance, int(3540/100)))  # 59минут
         # сообщение админу?
 
 
@@ -202,8 +203,8 @@ async def process_buttons_press_no(message: types.Message):
     await send_msg_to_admins(message, 'нажал кнопку, что оффер не открывается')
     await asyncio.sleep(30)  #30сек
     msg_personal_no = await message.answer(LEXICON_RU['msg_personal'])
-    asyncio.create_task(delete_message(msg_not_open, 7200))  # 2часа
-    asyncio.create_task(delete_message(msg_personal_no, 7200))  # 2часа, может больше?
+    asyncio.create_task(delete_message(msg_not_open, 7200/100))  # 2часа
+    asyncio.create_task(delete_message(msg_personal_no, 7200/100))  # 2часа, может больше?
 
 @router.message(F.text=='приобрести участие')
 async def get_offer_last_chance(message: types.Message):
@@ -212,7 +213,7 @@ async def get_offer_last_chance(message: types.Message):
     connect.commit()
     await send_msg_to_admins(message, 'пришел последний "шанс"')
     msg = await message.answer(LEXICON_RU['msg_last_chance_kb'])
-    asyncio.create_task(delete_message(msg, 3300)) # 58 минут
+    asyncio.create_task(delete_message(msg, 3300/100)) # 58 минут
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 @router.message(F.text=='бронировать участие 👌')
@@ -222,7 +223,7 @@ async def get_offer_five_reasons(message: types.Message):
     connect.commit()
     await send_msg_to_admins(message, 'получил ссылку "5 причин..."')
     msg = await message.answer(LEXICON_RU['msg_5_reasons_kb'])
-    asyncio.create_task(delete_message(msg, 18000)) # 5 часов
+    asyncio.create_task(delete_message(msg, 18000/100)) # 5 часов
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 @router.message(F.text=='Получить ссылку 🔗')
@@ -232,7 +233,7 @@ async def get_offer_after_artist_should_know(message: types.Message):
     connect.commit()
     await send_msg_to_admins(message, 'получил ссылку "Каждый артист.."')
     msg = await message.answer(LEXICON_RU['msg_artist_should_know_kb'])
-    asyncio.create_task(delete_message(msg, 21600)) # 6 часов
+    asyncio.create_task(delete_message(msg, 21600/100)) # 6 часов
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 @router.message(F.text=='Присоединиться к клубу 🔥')
@@ -242,18 +243,18 @@ async def get_offer_after_artist_should_know(message: types.Message):
     connect.commit()
     await send_msg_to_admins(message, 'Ошибка номер 1')
     msg = await message.answer(LEXICON_RU['msg_error_num1_offer_kb'])
-    asyncio.create_task(delete_message(msg, 21600)) # 6 часов
+    asyncio.create_task(delete_message(msg, 21600/100)) # 6 часов
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
 @router.message(F.text.in_(['клуб', 'Клуб', 'КЛУБ', '"КЛУБ"', 'rke,', 'RKE,']))
 async def cmd_club_react(message: types.Message):
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"SELECT club FROM users WHERE user_id = {message.from_user.id}")
-    if cursor.fetchone()[0] == 'да':
+    if cursor.fetchone()[0] == 'да' and message.from_user.id != 1372933011:
         await message.answer('Возможно ваше предложение уже истекло.\n'
                              'Наш менеджер свяжется с вами в ближайшее время\n'
                              'и сообщит новые условия')
-        await send_msg_to_admins(message, 'написал "КЛУБ" второй раз')
+        #await send_msg_to_admins(message, 'написал "КЛУБ" второй раз')
     else:
         cursor.execute(f"UPDATE users SET club = '{'да'}' WHERE user_id = {message.from_user.id}")
         connect.commit()
@@ -263,19 +264,19 @@ async def cmd_club_react(message: types.Message):
                                  f"Переходите, предложение доступно\n"
                                  f"2 дня")
 
-        asyncio.create_task(delete_message(msg_club_offer, 3600))  # через час
-        await asyncio.sleep(1800) # 30мин
+        asyncio.create_task(delete_message(msg_club_offer, 3600/100))  # через час
+        await asyncio.sleep(1800/100) # 30мин
         await send_kb_yes_no(message)
-        await asyncio.sleep(3700) #подождать чуть больше часа пока кнопки пропадут
+        await asyncio.sleep(3700/100) #подождать чуть больше часа пока кнопки пропадут
         # Проверка нажал ли кнопку
         cursor.execute(f"SELECT offer_status FROM users WHERE user_id = {message.from_user.id};")
         offer_status = cursor.fetchone()[0]
         if offer_status == '-':
             msg_you_asked = await message.answer(LEXICON_RU['msg_you_asked'])
-            asyncio.create_task(delete_message(msg_you_asked, 3600))  # 1час
-            await asyncio.sleep(7200) #1час? может больше, надо спросить?
+            asyncio.create_task(delete_message(msg_you_asked, 3600/100))  # 1час
+            await asyncio.sleep(7200/100) #1час? может больше, надо спросить?
             await send_kb_yes_no(message)
-            await asyncio.sleep(3600)  # 1час? может больше, надо спросить?
+            await asyncio.sleep(3600/100)  # 1час? может больше, надо спросить?
             msg_not_open = await message.answer(LEXICON_RU['msg_not_open'])
 
 
