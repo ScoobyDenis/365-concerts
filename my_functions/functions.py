@@ -48,6 +48,11 @@ async def delete_callback_message(message_id, chat_id, time):
 
 async def send_message_to_user(user_id: int, message: str):
     await bot.send_message(user_id, message)
+
+async def send_msg_to_admins(message: types.Message, msg):
+    for i in ADMINS:
+        await bot.send_message(i, f'{"@" + message.from_user.username} - {msg}')
+
 # Функция для отправки PDF файла
 async def send_pdf(chat_id: int, pdf_path: str, bot_token: str):
     url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
@@ -123,35 +128,6 @@ async def create_kb(button):
     return kb
 
 async def send_two_day_msgs(message: types.Message):
-    await asyncio.sleep(10) # 2 часа
-
-    msg_artist_should_know = await message.answer(LEXICON_RU['msg_artist_should_know'])
-    asyncio.create_task(delete_message(msg_artist_should_know, 30)) # 6 часов
-    await asyncio.sleep(30)  # 6 часов
-
-    msg_5years_more = await message.answer(LEXICON_RU['msg_5years_more'])
-    asyncio.create_task(delete_message(msg_5years_more, 10))  # 1 часов
-    await asyncio.sleep(10)  # 1 час
-
-    msg_reviews = await message.answer(LEXICON_RU['msg_reviews'])
-    asyncio.create_task(delete_message(msg_reviews, 60))  # 12 часов или не удалять
-    await asyncio.sleep(5)  # 15 мин
-
-    msg_next_offer = await message.answer(LEXICON_RU['msg_next_offer'])
-    asyncio.create_task(delete_message(msg_next_offer, 15))  # 3 часа
-    await asyncio.sleep(15)  # 3 часа
-
-    msg_error_num1_offer = await message.answer(LEXICON_RU['msg_error_num1_offer'])
-    asyncio.create_task(delete_message(msg_error_num1_offer, 30))  # 6 часов
-    await asyncio.sleep(30)  # 6 часов
-
-    msg_5_reasons_1 = await message.answer(LEXICON_RU['msg_5_reasons_1'])
-    msg_5_reasons_2 = await message.answer(LEXICON_RU['msg_5_reasons_2'])
-    asyncio.create_task(delete_message(msg_5_reasons_1, 25))  # 5 часов
-    asyncio.create_task(delete_message(msg_5_reasons_2, 25))  # 5 часов
-    await asyncio.sleep(25)  # 5 часов
-
-    msg_last_chance = await message.asnwer(LEXICON_RU['msg_last_chance'])
-    asyncio.create_task(delete_message(msg_last_chance, 10))  # 59минут
+    pass
 
 
