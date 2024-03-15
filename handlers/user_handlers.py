@@ -21,14 +21,14 @@ async def cmd_start(message: types.Message):
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"SELECT * FROM users WHERE user_id = {message.from_user.id}")
     user = cursor.fetchone()
-    if user:
+    if user and user not in ADMINS:
         pass
     else:
         await message.answer(message.from_user.first_name + ', ' + LEXICON_RU['/start'])
         await send_pdf(message.from_user.id, "files/formula.pdf", config.tg_bot.token)
 
-        data = [message.from_user.id, '@'+message.from_user.username, 0, 0, 'нет', '-', 0, 0, 0, 0]
-        cursor.execute("INSERT INTO users (user_id, user_name, mark1, mark2, club, offer_status, mark3, mark4, mark5, mark6)  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
+        data = [message.from_user.id, '@'+message.from_user.username, 0, 0, 'нет', '-', 0, 0, 0, 0, 'on']
+        cursor.execute("INSERT INTO users (user_id, user_name, mark1, mark2, club, offer_status, mark3, mark4, mark5, mark6, bot_status)  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
         connect.commit()
 
         await send_message_on_time(message,
@@ -67,20 +67,35 @@ async def get_admin_menu(message: types.Message):
     if message.from_user.id in ADMINS:
         await message.answer("Команды администратора:\n"
                              "/stats - общая статистика по меткам\n"
-                            "/get_file - получить таблицу со всей информацией")
+                            "/get_file - получить таблицу со всей информацией\n"
+                             "/bot_off username - отключение бота")
 
 @router.message(Command('get_file'))
 async def send_file(message: types.Message):
     if message.from_user.id in ADMINS:
         await convert_db_to_csv()
         await message.reply_document(FSInputFile('output.csv'))
-        await message.answer("mark1 - 'Почему профессиональные музыканты...'"
-                             "mark2 - 'Не хотят отдавать гонорар'"
+        await message.answer("mark1 - 'Почему не готовы'"
+                             "mark2 - 'Антикидалово'"
                              "mark3 - 'Это должен знать каждый артист'"
                              "mark4 - 'Ошибка N1'"
                              "mark5 - '5 ПРИЧИН'"
                              "mark6 - 'Последний шанс'")
 
+@router.message(Command('bot_off'))
+async def send_file(message: types.Message):
+    if message.from_user.id in ADMINS:
+        try:
+            command, user_id = message.text.split(maxsplit=1)
+            print(user_id)
+            try:
+                await change_bot_state_to_off(user_id)
+                await message.answer(f"Пользователь {user_id} отключен от бота")
+            except Exception as e:
+                await message.answer("Не правильно введен id пользователя")
+        except ValueError:
+            await message.answer("Пожалуйста, укажите id после команды /get_user_status\n"
+                                 "id есть в таблице /get_file")
 @router.message(Command('stats'))
 async def check_marks(message: types.Message):
     if message.from_user.id in ADMINS:
@@ -100,12 +115,12 @@ async def check_marks(message: types.Message):
         cursor.execute(f"SELECT COUNT(*) FROM users")
         size_db = cursor.fetchone()[0]
         await message.answer(f"Всего человек зашло в бота: <b>{size_db}</b>\n"
-                             f"По метке 'Почему профессиональные музыканты...' перешло: <b>{sum_marks1}</b>\n"
-                             f"По метке 'Не хотят отдавать гонорар' перешло: <b>{sum_marks2}</b>\n"
-                             f"По метке 'Это должен знать каждый артист' перешло: <b>{sum_marks3}</b>\n"
-                             f"По метке 'Ошибка N1' перешло: <b>{sum_marks4}</b>\n"
-                             f"По метке '5 ПРИЧИН' перешло: <b>{sum_marks5}</b>\n"
-                             f"По метке 'Последний шанс' перешло: <b>{sum_marks6}</b>", parse_mode='HTML')
+                             f"По метке 'Почему не готовы' перешло: <b>{sum_marks1}</b>\n"
+                             f"По метке 'Антикидалово' перешло: <b>{sum_marks2}</b>\n"
+                             f"По метке 'club offer Это должен знать каждый артист' перешло: <b>{sum_marks3}</b>\n"
+                             f"По метке 'club offer Ошибка N1' перешло: <b>{sum_marks4}</b>\n"
+                             f"По метке 'club offer 5 ПРИЧИН' перешло: <b>{sum_marks5}</b>\n"
+                             f"По метке 'club offer Последний шанс' перешло: <b>{sum_marks6}</b>", parse_mode='HTML')
 
 
 
@@ -147,34 +162,41 @@ async def process_buttons_press_yes(message: types.Message):
     asyncio.create_task(delete_message(msg_personal_yes, 7200))  # 2 часа
     await asyncio.sleep(7200)  # 2 часа
 
-    msg_artist_should_know = await message.answer(LEXICON_RU['msg_artist_should_know'], reply_markup=await create_kb('Получить ссылку 🔗'))
-    asyncio.create_task(delete_message(msg_artist_should_know, 21600))  # 6 часов
-    await asyncio.sleep(21605)  # 6 часов
+    if await check_bot_state(message):
+        msg_artist_should_know = await message.answer(LEXICON_RU['msg_artist_should_know'], reply_markup=await create_kb('Получить ссылку 🔗'))
+        asyncio.create_task(delete_message(msg_artist_should_know, 21600))  # 6 часов
+        await asyncio.sleep(21605)  # 6 часов
 
-    msg_5years_more = await message.answer(LEXICON_RU['msg_5years_more'])
-    asyncio.create_task(delete_message(msg_5years_more, 3600))  # 1 часов
-    await asyncio.sleep(3605)  # 1 час
+    if await check_bot_state(message):
+        msg_5years_more = await message.answer(LEXICON_RU['msg_5years_more'])
+        asyncio.create_task(delete_message(msg_5years_more, 3600))  # 1 часов
+        await asyncio.sleep(3605)  # 1 час
 
-    msg_reviews = await message.answer(LEXICON_RU['msg_reviews'])
-    await asyncio.sleep(900)  # 15 мин
+    if await check_bot_state(message):
+        msg_reviews = await message.answer(LEXICON_RU['msg_reviews'])
+        await asyncio.sleep(900)  # 15 мин
 
-    msg_next_offer = await message.answer(LEXICON_RU['msg_next_offer'])
-    asyncio.create_task(delete_message(msg_next_offer, 10800))  # 3 часа
-    await asyncio.sleep(10805)  # 3 часа
+    if await check_bot_state(message):
+        msg_next_offer = await message.answer(LEXICON_RU['msg_next_offer'])
+        asyncio.create_task(delete_message(msg_next_offer, 10800))  # 3 часа
+        await asyncio.sleep(10805)  # 3 часа
 
-    msg_error_num1_offer = await message.answer(LEXICON_RU['msg_error_num1_offer'], reply_markup=await create_kb('Присоединиться к клубу 🔥'))
-    asyncio.create_task(delete_message(msg_error_num1_offer, 21600))  # 6 часов
-    await asyncio.sleep(21605)  # 6 часов
+    if await check_bot_state(message):
+        msg_error_num1_offer = await message.answer(LEXICON_RU['msg_error_num1_offer'], reply_markup=await create_kb('Присоединиться к клубу 🔥'))
+        asyncio.create_task(delete_message(msg_error_num1_offer, 21600))  # 6 часов
+        await asyncio.sleep(21605)  # 6 часов
 
-    msg_5_reasons_1 = await message.answer(LEXICON_RU['msg_5_reasons_1'])
-    msg_5_reasons_2 = await message.answer(LEXICON_RU['msg_5_reasons_2'], reply_markup=await create_kb('бронировать участие 👌'))
-    asyncio.create_task(delete_message(msg_5_reasons_1, 16200))  # 4 30 часов
-    asyncio.create_task(delete_message(msg_5_reasons_2, 16200))  # 4 30 часов
-    await asyncio.sleep(16205)  # 5 часов
-
-    msg_last_chance = await message.answer(LEXICON_RU['msg_last_chance'], reply_markup=await create_kb('приобрести участие'))
-    asyncio.create_task(delete_message(msg_last_chance, 3540))  # 59минут
-    # сообщение админу?
+    if await check_bot_state(message):
+        msg_5_reasons_1 = await message.answer(LEXICON_RU['msg_5_reasons_1'])
+        msg_5_reasons_2 = await message.answer(LEXICON_RU['msg_5_reasons_2'], reply_markup=await create_kb('бронировать участие 👌'))
+        asyncio.create_task(delete_message(msg_5_reasons_1, 16200))  # 4 30 часов
+        asyncio.create_task(delete_message(msg_5_reasons_2, 16200))  # 4 30 часов
+        await asyncio.sleep(16205)  # 5 часов
+        
+    if await check_bot_state(message):
+        msg_last_chance = await message.answer(LEXICON_RU['msg_last_chance'], reply_markup=await create_kb('приобрести участие'))
+        asyncio.create_task(delete_message(msg_last_chance, 3540))  # 59минут
+        # сообщение админу?
 
 
 
