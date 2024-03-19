@@ -31,25 +31,14 @@ async def cmd_start(message: types.Message):
         cursor.execute("INSERT INTO users (user_id, user_name, mark1, mark2, club, offer_status, mark3, mark4, mark5, mark6, bot_status)  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
         connect.commit()
 
-        await asyncio.sleep(300/100)
+        await asyncio.sleep(300/10) # 5 min
         msg2_youtube = await message.answer(LEXICON_RU['msg2_youtube'], reply_markup=await create_kb('Получить запись'))
         asyncio.create_task(delete_message(msg2_youtube, 14400/100-100))  # 4 часа
-        # await send_message_on_time(message,
-        #                            LEXICON_RU['msg2_youtube'],
-        #                            300/100,  # 5мин
-        #                            14400/100,  # 4 часа
-        #                            kb=await create_kb('Получить запись'))
 
         offer_1_pic = FSInputFile("files/offer_1.jpg")
         await asyncio.sleep(45)  # временно, вместо строки ниже
         #await wait_until(10, 30) # 10:30
         ms3_send_photo = await message.answer_photo(offer_1_pic, LEXICON_RU['msg3_offer'], parse_mode='HTML')
-        # await send_photo_on_time(message,
-        #                          photo=offer_1_pic,
-        #                          cap=LEXICON_RU['msg3_offer'],
-        #                          seconds=15000/100, #4часа 10мин
-        #                          seconds_to_del=82800/400, #23 часа
-        #                          parse_mode='HTML')
         asyncio.create_task(delete_message(ms3_send_photo, 82800/400)) # 23 часа
         await asyncio.sleep(82800/400) # 23 часа
         # проверка писал ли пользователь клуб. если нет то шлем контент дальше
