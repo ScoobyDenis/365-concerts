@@ -37,7 +37,7 @@ async def cmd_start(message: types.Message):
 
         offer_1_pic = FSInputFile("files/offer_1.jpg")
         await asyncio.sleep(45)  # временно, вместо строки ниже
-        #await wait_until(10, 30) # 10:30
+        await wait_until(6, 30) # 10:30
         ms3_send_photo = await message.answer_photo(offer_1_pic, LEXICON_RU['msg3_offer'], parse_mode='HTML')
         asyncio.create_task(delete_message(ms3_send_photo, 82800/400)) # 23 часа
         await asyncio.sleep(82800/400) # 23 часа
