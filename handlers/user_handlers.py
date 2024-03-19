@@ -223,6 +223,7 @@ async def cmd_club_react(message: types.Message):
         cursor.execute(f"UPDATE users SET club = '{'да'}' WHERE user_id = {message.from_user.id}")
         connect.commit()
         await send_msg_to_admins(message, 'написал "КЛУБ"')
+
         msg_club_offer = await message.answer(f"{message.from_user.first_name}, ваше персональное предложение по закрытому клубу доступно по этой ссылке👇\n\n"
                                  f"{'https://365concerts.ru/club_bot_149'}\n\n"
                                  f"Переходите, предложение доступно\n"

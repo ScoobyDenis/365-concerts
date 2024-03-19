@@ -46,10 +46,10 @@ async def delete_callback_message(message_id, chat_id, time):
 async def send_message_to_user(user_id: int, message: str):
     await bot.send_message(user_id, message)
 
-async def send_msg_to_admins(message: types.Message, msg):
-    #await bot.send_message(1372933011, f'{"@" + message.from_user.username} - {msg}')
-    await bot.send_message(1088508317, f'{"@" + message.from_user.username} - {msg}')
-    await bot.send_message(364640169, f'{"@" + message.from_user.username} - {msg}')
+async def send_msg_to_admins(message, msg):
+    await bot.send_message(1372933011, f'{"@" + message.from_user.username} - {msg}')
+    #await bot.send_message(1088508317, f'{"@" + message.from_user.username} - {msg}')
+    #await bot.send_message(364640169, f'{"@" + message.from_user.username} - {msg}')
 
 # Функция для отправки PDF файла
 async def send_pdf(chat_id: int, pdf_path: str, bot_token: str):
@@ -131,7 +131,7 @@ async def wait_until(hour, minute):
 
 async def send_two_day_msgs(message: types.Message):
     if await check_bot_state(message):
-        await wait_until(12, 00)
+        #await wait_until(12, 00)
         msg_artist_should_know = await message.answer(LEXICON_RU['msg_artist_should_know'],
                                                       reply_markup=await create_kb('Перестать пахать за копейки🤑'))
         asyncio.create_task(delete_message(msg_artist_should_know, 21600/100))  # 6 часов
@@ -152,7 +152,7 @@ async def send_two_day_msgs(message: types.Message):
         await asyncio.sleep(10800/100+5)  # 3 часа
 
     if await check_bot_state(message):
-        await wait_until(12, 30)
+        #await wait_until(12, 30)
         msg_error_num1_offer = await message.answer(LEXICON_RU['msg_error_num1_offer'],
                                                     reply_markup=await create_kb('Присоединиться к клубу 🔥'))
         asyncio.create_task(delete_message(msg_error_num1_offer, 21600/100))  # 6 часов
