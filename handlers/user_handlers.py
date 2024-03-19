@@ -33,7 +33,7 @@ async def cmd_start(message: types.Message):
 
         await asyncio.sleep(300/100)
         msg2_youtube = await message.answer(LEXICON_RU['msg2_youtube'], reply_markup=await create_kb('Получить запись'))
-        asyncio.create_task(delete_message(msg2_youtube, 14400/100))  # 4 часа
+        asyncio.create_task(delete_message(msg2_youtube, 14400/100-100))  # 4 часа
         # await send_message_on_time(message,
         #                            LEXICON_RU['msg2_youtube'],
         #                            300/100,  # 5мин
@@ -41,13 +41,17 @@ async def cmd_start(message: types.Message):
         #                            kb=await create_kb('Получить запись'))
 
         offer_1_pic = FSInputFile("files/offer_1.jpg")
-        await send_photo_on_time(message,
-                                 photo=offer_1_pic,
-                                 cap=LEXICON_RU['msg3_offer'],
-                                 seconds=15000/100, #4часа 10мин
-                                 seconds_to_del=82800/400, #23 часа
-                                 parse_mode='HTML')
-        await asyncio.sleep(82800/400)
+        await asyncio.sleep(45)  # временно, вместо строки ниже
+        #await wait_until(10, 30) # 10:30
+        ms3_send_photo = await message.answer_photo(offer_1_pic, LEXICON_RU['msg3_offer'], parse_mode='HTML')
+        # await send_photo_on_time(message,
+        #                          photo=offer_1_pic,
+        #                          cap=LEXICON_RU['msg3_offer'],
+        #                          seconds=15000/100, #4часа 10мин
+        #                          seconds_to_del=82800/400, #23 часа
+        #                          parse_mode='HTML')
+        asyncio.create_task(delete_message(ms3_send_photo, 82800/400)) # 23 часа
+        await asyncio.sleep(82800/400) # 23 часа
         # проверка писал ли пользователь клуб. если нет то шлем контент дальше
         if await check_club_state(message):
             pass
