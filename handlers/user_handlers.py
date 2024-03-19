@@ -31,11 +31,14 @@ async def cmd_start(message: types.Message):
         cursor.execute("INSERT INTO users (user_id, user_name, mark1, mark2, club, offer_status, mark3, mark4, mark5, mark6, bot_status)  VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", data)
         connect.commit()
 
-        await send_message_on_time(message,
-                                   LEXICON_RU['msg2_youtube'],
-                                   300/100,  # 5мин
-                                   14400/100,  # 4 часа
-                                   kb=await create_kb('Получить запись'))
+        await asyncio.sleep(300/100)
+        msg2_youtube = await message.answer(LEXICON_RU['msg2_youtube'], reply_markup=await create_kb('Получить запись'))
+        asyncio.create_task(delete_message(msg2_youtube, 14400/100))  # 4 часа
+        # await send_message_on_time(message,
+        #                            LEXICON_RU['msg2_youtube'],
+        #                            300/100,  # 5мин
+        #                            14400/100,  # 4 часа
+        #                            kb=await create_kb('Получить запись'))
 
         offer_1_pic = FSInputFile("files/offer_1.jpg")
         await send_photo_on_time(message,
