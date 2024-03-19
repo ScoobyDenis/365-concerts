@@ -21,7 +21,7 @@ async def cmd_start(message: types.Message):
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"SELECT * FROM users WHERE user_id = {message.from_user.id}")
     user = cursor.fetchone()
-    if user and message.from_user.id != 1372933011:
+    if user:
         pass
     else:
         await message.answer(message.from_user.first_name + ', ' + LEXICON_RU['/start'])
@@ -53,7 +53,7 @@ async def cmd_start(message: types.Message):
                                        LEXICON_RU['msg4_youtube'],
                                        30/10, # после задержки 23 часа
                                        14400/100, # 4часа
-                                       kb=await create_kb('Не хотят отдавать гонорар!😡'))
+                                       kb=await create_kb('Получить запись🔗'))
 
             await asyncio.sleep(14400/100)
             msg_reels_rules = await message.answer(LEXICON_RU['msg5'], parse_mode='HTML')
@@ -66,8 +66,32 @@ async def get_admin_menu(message: types.Message):
         await message.answer("Команды администратора:\n"
                              "/stats - общая статистика по меткам\n"
                             "/get_file - получить таблицу со всей информацией\n"
-                             "/bot_off username - отключение бота")
-
+                             "/bot_off id - отключение бота")
+@router.message(Command('stats'))
+async def check_marks(message: types.Message):
+    if message.from_user.id in ADMINS:
+        connect, cursor = connect_db(DB_NAME)
+        cursor.execute(f"SELECT SUM(mark1) FROM users")
+        sum_marks1 = cursor.fetchone()[0]
+        cursor.execute(f"SELECT SUM(mark2) FROM users")
+        sum_marks2 = cursor.fetchone()[0]
+        cursor.execute(f"SELECT SUM(mark3) FROM users")
+        sum_marks3 = cursor.fetchone()[0]
+        cursor.execute(f"SELECT SUM(mark4) FROM users")
+        sum_marks4 = cursor.fetchone()[0]
+        cursor.execute(f"SELECT SUM(mark5) FROM users")
+        sum_marks5 = cursor.fetchone()[0]
+        cursor.execute(f"SELECT SUM(mark6) FROM users")
+        sum_marks6 = cursor.fetchone()[0]
+        cursor.execute(f"SELECT COUNT(*) FROM users")
+        size_db = cursor.fetchone()[0]
+        await message.answer(f"Всего человек зашло в бота: <b>{size_db}</b>\n"
+                             f"По метке 'Почему не готовы' перешло: <b>{sum_marks1}</b>\n"
+                             f"По метке 'Антикидалово' перешло: <b>{sum_marks2}</b>\n"
+                             f"По метке 'club offer Это должен знать каждый артист' перешло: <b>{sum_marks3}</b>\n"
+                             f"По метке 'club offer Ошибка N1' перешло: <b>{sum_marks4}</b>\n"
+                             f"По метке 'club offer 5 ПРИЧИН' перешло: <b>{sum_marks5}</b>\n"
+                             f"По метке 'club offer Последний шанс' перешло: <b>{sum_marks6}</b>", parse_mode='HTML')
 @router.message(Command('get_file'))
 async def send_file(message: types.Message):
     if message.from_user.id in ADMINS:
@@ -94,31 +118,7 @@ async def send_file(message: types.Message):
             await message.answer("Пожалуйста, укажите id после \n"
                                  "команды /bot_off\n"
                                  "id есть в таблице /get_file")
-@router.message(Command('stats'))
-async def check_marks(message: types.Message):
-    if message.from_user.id in ADMINS:
-        connect, cursor = connect_db(DB_NAME)
-        cursor.execute(f"SELECT SUM(mark1) FROM users")
-        sum_marks1 = cursor.fetchone()[0]
-        cursor.execute(f"SELECT SUM(mark2) FROM users")
-        sum_marks2 = cursor.fetchone()[0]
-        cursor.execute(f"SELECT SUM(mark3) FROM users")
-        sum_marks3 = cursor.fetchone()[0]
-        cursor.execute(f"SELECT SUM(mark4) FROM users")
-        sum_marks4 = cursor.fetchone()[0]
-        cursor.execute(f"SELECT SUM(mark5) FROM users")
-        sum_marks5 = cursor.fetchone()[0]
-        cursor.execute(f"SELECT SUM(mark6) FROM users")
-        sum_marks6 = cursor.fetchone()[0]
-        cursor.execute(f"SELECT COUNT(*) FROM users")
-        size_db = cursor.fetchone()[0]
-        await message.answer(f"Всего человек зашло в бота: <b>{size_db}</b>\n"
-                             f"По метке 'Почему не готовы' перешло: <b>{sum_marks1}</b>\n"
-                             f"По метке 'Антикидалово' перешло: <b>{sum_marks2}</b>\n"
-                             f"По метке 'club offer Это должен знать каждый артист' перешло: <b>{sum_marks3}</b>\n"
-                             f"По метке 'club offer Ошибка N1' перешло: <b>{sum_marks4}</b>\n"
-                             f"По метке 'club offer 5 ПРИЧИН' перешло: <b>{sum_marks5}</b>\n"
-                             f"По метке 'club offer Последний шанс' перешло: <b>{sum_marks6}</b>", parse_mode='HTML')
+
 
 @router.message(F.text=="Получить запись")
 async def cmd_youtube_filter1(message: types.Message):
@@ -134,7 +134,7 @@ async def cmd_youtube_filter1(message: types.Message):
     asyncio.create_task(delete_message(msg1_youtube_filter1, 14400/100))  # 4часа
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
-@router.message(F.text=="Не хотят отдавать гонорар!😡")
+@router.message(F.text=="Получить запись🔗")
 async def cmd_youtube_filter2(message: types.Message):
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"UPDATE users SET mark2 = mark2 + 1 WHERE user_id = {message.from_user.id}")
@@ -155,42 +155,7 @@ async def process_buttons_press_yes(message: types.Message):
     msg_personal_yes = await message.answer(LEXICON_RU['msg_personal'])
     asyncio.create_task(delete_message(msg_personal_yes, 7200/100))  # 2 часа
     await asyncio.sleep(7200/100)  # 2 часа
-
-    if await check_bot_state(message):
-        msg_artist_should_know = await message.answer(LEXICON_RU['msg_artist_should_know'], reply_markup=await create_kb('Получить ссылку 🔗'))
-        asyncio.create_task(delete_message(msg_artist_should_know, 21600/100))  # 6 часов
-        await asyncio.sleep(21600/100)  # 6 часов 21605
-
-    if await check_bot_state(message):
-        msg_5years_more = await message.answer(LEXICON_RU['msg_5years_more'])
-        asyncio.create_task(delete_message(msg_5years_more, 3600/100))  # 1 часов
-        await asyncio.sleep(3600/100)  # 1 час 3605
-
-    if await check_bot_state(message):
-        msg_reviews = await message.answer(LEXICON_RU['msg_reviews'])
-        await asyncio.sleep(900/100)  # 15 мин
-
-    if await check_bot_state(message):
-        msg_next_offer = await message.answer(LEXICON_RU['msg_next_offer'])
-        asyncio.create_task(delete_message(msg_next_offer, 10800/100))  # 3 часа
-        await asyncio.sleep(1080/100)  # 3 часа 10805
-
-    if await check_bot_state(message):
-        msg_error_num1_offer = await message.answer(LEXICON_RU['msg_error_num1_offer'], reply_markup=await create_kb('Присоединиться к клубу 🔥'))
-        asyncio.create_task(delete_message(msg_error_num1_offer, 21600/100))  # 6 часов
-        await asyncio.sleep(21600/100)  # 6 часов 21605
-
-    if await check_bot_state(message):
-        msg_5_reasons_1 = await message.answer(LEXICON_RU['msg_5_reasons_1'])
-        msg_5_reasons_2 = await message.answer(LEXICON_RU['msg_5_reasons_2'], reply_markup=await create_kb('бронировать участие 👌'))
-        asyncio.create_task(delete_message(msg_5_reasons_1, 16200/100))  # 4:30 часов
-        asyncio.create_task(delete_message(msg_5_reasons_2, 16200/100))  # 4:30 часов
-        await asyncio.sleep(16205)  # 5 часов
-
-    if await check_bot_state(message):
-        msg_last_chance = await message.answer(LEXICON_RU['msg_last_chance'], reply_markup=await create_kb('приобрести участие'))
-        asyncio.create_task(delete_message(msg_last_chance, int(3540/100)))  # 59минут
-        # сообщение админу?
+    await send_two_day_msgs(message)
 
 
 
@@ -205,6 +170,7 @@ async def process_buttons_press_no(message: types.Message):
     msg_personal_no = await message.answer(LEXICON_RU['msg_personal'])
     asyncio.create_task(delete_message(msg_not_open, 7200/100))  # 2часа
     asyncio.create_task(delete_message(msg_personal_no, 7200/100))  # 2часа, может больше?
+    await send_two_day_msgs(message)
 
 @router.message(F.text=='приобрести участие')
 async def get_offer_last_chance(message: types.Message):
@@ -226,7 +192,7 @@ async def get_offer_five_reasons(message: types.Message):
     asyncio.create_task(delete_message(msg, 18000/100)) # 5 часов
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
-@router.message(F.text=='Получить ссылку 🔗')
+@router.message(F.text=='Перестать пахать за копейки🤑')
 async def get_offer_after_artist_should_know(message: types.Message):
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"UPDATE users SET mark3 =  mark3 + 1 WHERE user_id = {message.from_user.id}")
@@ -241,7 +207,7 @@ async def get_offer_after_artist_should_know(message: types.Message):
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"UPDATE users SET mark4 =  mark4 + 1 WHERE user_id = {message.from_user.id}")
     connect.commit()
-    await send_msg_to_admins(message, 'Ошибка номер 1')
+    await send_msg_to_admins(message, 'получил ссылку "Ошибка номер 1"')
     msg = await message.answer(LEXICON_RU['msg_error_num1_offer_kb'])
     asyncio.create_task(delete_message(msg, 21600/100)) # 6 часов
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
@@ -250,11 +216,13 @@ async def get_offer_after_artist_should_know(message: types.Message):
 async def cmd_club_react(message: types.Message):
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"SELECT club FROM users WHERE user_id = {message.from_user.id}")
-    if cursor.fetchone()[0] == 'да' and message.from_user.id != 1372933011:
-        await message.answer('Возможно ваше предложение уже истекло.\n'
-                             'Наш менеджер свяжется с вами в ближайшее время\n'
-                             'и сообщит новые условия')
-        #await send_msg_to_admins(message, 'написал "КЛУБ" второй раз')
+    if cursor.fetchone()[0] == 'да':
+        await message.answer('Возможно, ваше предложение уже\n'
+                             'истекло. Наш менеджер\n'
+                             'свяжется с вами в ближайшее\n'
+                             'время и сообщит новые\n '
+                             'условия')
+        await send_msg_to_admins(message, 'написал "КЛУБ" второй раз')
     else:
         cursor.execute(f"UPDATE users SET club = '{'да'}' WHERE user_id = {message.from_user.id}")
         connect.commit()
@@ -275,9 +243,12 @@ async def cmd_club_react(message: types.Message):
             msg_you_asked = await message.answer(LEXICON_RU['msg_you_asked'])
             asyncio.create_task(delete_message(msg_you_asked, 3600/100))  # 1час
             await asyncio.sleep(7200/100) #1час? может больше, надо спросить?
-            await send_kb_yes_no(message)
+            # await send_kb_yes_no(message)
             await asyncio.sleep(3600/100)  # 1час? может больше, надо спросить?
             msg_not_open = await message.answer(LEXICON_RU['msg_not_open'])
+            asyncio.create_task(delete_message(msg_not_open, 3600 / 100))  # 1час
+
+            await send_two_day_msgs(message)
 
 
 
