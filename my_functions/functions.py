@@ -47,7 +47,7 @@ async def send_message_to_user(user_id: int, message: str):
     await bot.send_message(user_id, message)
 
 async def send_msg_to_admins(message: types.Message, msg):
-    await bot.send_message(1372933011, f'{"@" + message.from_user.username} - {msg}')
+    #await bot.send_message(1372933011, f'{"@" + message.from_user.username} - {msg}')
     await bot.send_message(1088508317, f'{"@" + message.from_user.username} - {msg}')
     await bot.send_message(364640169, f'{"@" + message.from_user.username} - {msg}')
 
