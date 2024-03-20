@@ -21,9 +21,7 @@ async def cmd_start(message: types.Message):
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"SELECT * FROM users WHERE user_id = {message.from_user.id}")
     user = cursor.fetchone()
-    if user:
-        pass
-    else:
+    if not user:
         await message.answer(message.from_user.first_name + ', ' + LEXICON_RU['/start'])
         await send_pdf(message.from_user.id, "files/formula.pdf", config.tg_bot.token)
 
@@ -36,15 +34,13 @@ async def cmd_start(message: types.Message):
         asyncio.create_task(delete_message(msg2_youtube, 14400/100-100))  # 4 часа
 
         offer_1_pic = FSInputFile("files/offer_1.jpg")
-        await asyncio.sleep(45)  # временно, вместо строки ниже
-        await wait_until(6, 30) # 10:30
+
+        await wait_until(11   , 55) # 10:30
         ms3_send_photo = await message.answer_photo(offer_1_pic, LEXICON_RU['msg3_offer'], parse_mode='HTML')
         asyncio.create_task(delete_message(ms3_send_photo, 82800/400)) # 23 часа
         await asyncio.sleep(82800/400) # 23 часа
         # проверка писал ли пользователь клуб. если нет то шлем контент дальше
-        if await check_club_state(message):
-            pass
-        else:
+        if not await check_club_state(message):
             await send_message_on_time(message,
                                        LEXICON_RU['msg4_youtube'],
                                        30/10, # после задержки 23 часа
@@ -53,8 +49,6 @@ async def cmd_start(message: types.Message):
 
             await asyncio.sleep(14400/100)
             msg_reels_rules = await message.answer(LEXICON_RU['msg5'], parse_mode='HTML')
-
-
 
 @router.message(Command('admin'))
 async def get_admin_menu(message: types.Message):

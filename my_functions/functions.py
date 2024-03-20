@@ -124,10 +124,23 @@ async def create_kb(button):
     return kb
 
 
-async def wait_until(hour, minute):
-    target_time = datetime.time(hour, minute)
-    while datetime.datetime.now().time() < target_time:
-        await asyncio.sleep(60)
+# async def wait_until(hour, minute):
+#     target_time = datetime.time(hour, minute)
+#     while datetime.datetime.now().time() < target_time:
+#         await asyncio.sleep(60)
+
+async def wait_until(hour, min):
+    current_time = datetime.datetime.now().time()
+    target_time = datetime.time(hour, min, 0)
+
+    if current_time < target_time:
+        delta = datetime.datetime.combine(datetime.date.today(), target_time) - datetime.datetime.now()
+    else:
+        tomorrow = datetime.datetime.now() + datetime.timedelta(days=1)
+        delta = datetime.datetime.combine(tomorrow.date(), target_time) - datetime.datetime.now()
+
+    delta_seconds = delta.total_seconds()
+    await asyncio.sleep(delta_seconds)
 
 async def send_two_day_msgs(message: types.Message):
     if await check_bot_state(message):
