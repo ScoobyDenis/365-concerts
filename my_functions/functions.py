@@ -144,42 +144,42 @@ async def wait_until(hour, min):
 
 async def send_two_day_msgs(message: types.Message):
     if await check_bot_state(message):
-        await wait_until(8, 55) # 11 30
+        await wait_until(8, 30) # 11 30
         msg_artist_should_know = await message.answer(LEXICON_RU['msg_artist_should_know'],
                                                       reply_markup=await create_kb('Перестать пахать за копейки🤑'))
-        asyncio.create_task(delete_message(msg_artist_should_know, 21600/100))  # 6 часов
-        await asyncio.sleep(21600/100+5)  # 6 часов
+        asyncio.create_task(delete_message(msg_artist_should_know, 21600))  # 6 часов
+        await asyncio.sleep(21605)  # 6 часов
 
     if await check_bot_state(message):
         msg_5years_more = await message.answer(LEXICON_RU['msg_5years_more'])
-        asyncio.create_task(delete_message(msg_5years_more, 3600/100))  # 1 часов
-        await asyncio.sleep(3600/100)  # 1 час
+        asyncio.create_task(delete_message(msg_5years_more, 3600))  # 1 часов
+        await asyncio.sleep(3600)  # 1 час
 
     if await check_bot_state(message):
         msg_reviews = await message.answer(LEXICON_RU['msg_reviews'])
-        await asyncio.sleep(900/100)  # 15 мин
+        await asyncio.sleep(900)  # 15 мин
 
     if await check_bot_state(message):
         msg_next_offer = await message.answer(LEXICON_RU['msg_next_offer'])
-        asyncio.create_task(delete_message(msg_next_offer, 10800/100))  # 3 часа
-        await asyncio.sleep(10800/100+5)  # 3 часа
+        asyncio.create_task(delete_message(msg_next_offer, 10800))  # 3 часа
+        await asyncio.sleep(10800)  # 3 часа
 
     if await check_bot_state(message):
-        await wait_until(9, 0) # 12 30
+        await wait_until(9, 30) # 12 30
         msg_error_num1_offer = await message.answer(LEXICON_RU['msg_error_num1_offer'],
                                                     reply_markup=await create_kb('Присоединиться к клубу 🔥'))
-        asyncio.create_task(delete_message(msg_error_num1_offer, 21600/100))  # 6 часов
-        await asyncio.sleep(21600/100+5)  # 5 часов
+        asyncio.create_task(delete_message(msg_error_num1_offer, 21600))  # 6 часов
+        await asyncio.sleep(21605)  # 5 часов
 
     if await check_bot_state(message):
         msg_5_reasons_1 = await message.answer(LEXICON_RU['msg_5_reasons_1'])
         msg_5_reasons_2 = await message.answer(LEXICON_RU['msg_5_reasons_2'],
                                                reply_markup=await create_kb('бронировать участие 👌'))
-        asyncio.create_task(delete_message(msg_5_reasons_1, 16200/100))  # 4:30 часов
-        asyncio.create_task(delete_message(msg_5_reasons_2, 16200/100))  # 4:30 часов
-        await asyncio.sleep(3600/100)  # 1 час
+        asyncio.create_task(delete_message(msg_5_reasons_1, 16200))  # 4:30 часов
+        asyncio.create_task(delete_message(msg_5_reasons_2, 16200))  # 4:30 часов
+        await asyncio.sleep(3600)  # 1 час
     if await check_bot_state(message):
         msg_last_chance = await message.answer(LEXICON_RU['msg_last_chance'],
                                                reply_markup=await create_kb('приобрести участие'))
-        asyncio.create_task(delete_message(msg_last_chance, 3600/100))  # 59минут
+        asyncio.create_task(delete_message(msg_last_chance, 3600))  # 59минут
 
