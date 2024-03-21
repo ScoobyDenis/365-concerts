@@ -6,7 +6,7 @@ from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, KeyboardButton, ReplyKeyboardMarkup, FSInputFile, InlineKeyboardButton, \
-    InlineKeyboardMarkup, CallbackQuery
+    InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardRemove
 from lexicon.lexicon import LEXICON_RU
 from config_data.config import Config, load_config
 from data_bases.connect_data_base import connect_db, DB_NAME, ADMINS
@@ -35,9 +35,17 @@ async def cmd_start(message: types.Message):
 
         offer_1_pic = FSInputFile("files/offer_1.jpg")
 
-        await datetime.datetime.now().time()
-        print(datetime.datetime.now().time())
-        await wait_until(11   , 5) # 10:30
+
+        m = datetime.datetime.now().time()
+        await message.answer(str(m))
+
+
+        await wait_until(11   , 25) # 10:30
+
+        m = datetime.datetime.now().time()
+        await message.answer(str(m))
+
+
         ms3_send_photo = await message.answer_photo(offer_1_pic, LEXICON_RU['msg3_offer'], parse_mode='HTML')
         asyncio.create_task(delete_message(ms3_send_photo, 82800/400)) # 23 часа
         await asyncio.sleep(82800/400) # 23 часа
@@ -118,7 +126,7 @@ async def cmd_youtube_filter1(message: types.Message):
     cursor.execute(f"UPDATE users SET mark1 =  mark1 + 1 WHERE user_id = {message.from_user.id}")
     connect.commit()
 
-    msg1_youtube_filter1 = await message.answer(f"{'https://youtu.be/8Z4aFPKMPkE'}\n")
+    msg1_youtube_filter1 = await message.answer(f"{'https://youtu.be/8Z4aFPKMPkE'}\n", reply_markup=ReplyKeyboardRemove())
     await asyncio.sleep(60/10) #1min
     msg2_youtube_filter1 = await message.answer(LEXICON_RU['msg2_youtube_filter1'])
 
