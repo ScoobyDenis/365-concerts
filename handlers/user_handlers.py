@@ -35,16 +35,7 @@ async def cmd_start(message: types.Message):
 
         offer_1_pic = FSInputFile("files/offer_1.jpg")
 
-
-        m = datetime.datetime.now().time()
-        await message.answer(str(m))
-
-
-        await wait_until(11   , 25) # 10:30
-
-        m = datetime.datetime.now().time()
-        await message.answer(str(m))
-
+        await wait_until(8   , 35) # 10:30
 
         ms3_send_photo = await message.answer_photo(offer_1_pic, LEXICON_RU['msg3_offer'], parse_mode='HTML')
         asyncio.create_task(delete_message(ms3_send_photo, 82800/400)) # 23 часа
@@ -139,7 +130,7 @@ async def cmd_youtube_filter2(message: types.Message):
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"UPDATE users SET mark2 = mark2 + 1 WHERE user_id = {message.from_user.id}")
     connect.commit()
-    msg1_youtube_filter2 = await message.answer(f"{'https://youtu.be/4Ltp7kyoZrg'}\n")
+    msg1_youtube_filter2 = await message.answer(f"{'https://youtu.be/4Ltp7kyoZrg'}\n", reply_markup=ReplyKeyboardRemove())
     await asyncio.sleep(5)  # сразу
     msg2_youtube_filter2 = await message.answer(LEXICON_RU['msg2_youtube_filter2'])
     asyncio.create_task(delete_message(msg2_youtube_filter2, 10800/100)) #3часа
@@ -152,7 +143,7 @@ async def process_buttons_press_yes(message: types.Message):
     cursor.execute(f"UPDATE users SET offer_status = 'Да' WHERE user_id = {message.from_user.id}")
     connect.commit()
 
-    msg_personal_yes = await message.answer(LEXICON_RU['msg_personal'])
+    msg_personal_yes = await message.answer(LEXICON_RU['msg_personal'], reply_markup=ReplyKeyboardRemove())
     asyncio.create_task(delete_message(msg_personal_yes, 7200/100))  # 2 часа
     await asyncio.sleep(7200/100)  # 2 часа
     await send_two_day_msgs(message)
@@ -161,7 +152,7 @@ async def process_buttons_press_yes(message: types.Message):
 
 @router.message(F.text=='Нет❌')
 async def process_buttons_press_no(message: types.Message):
-    msg_not_open = await message.answer(LEXICON_RU['msg_not_open'])
+    msg_not_open = await message.answer(LEXICON_RU['msg_not_open'], reply_markup=ReplyKeyboardRemove())
     connect, cursor = connect_db(DB_NAME)
     cursor.execute(f"UPDATE users SET offer_status = 'Нет' WHERE user_id = {message.from_user.id}")
     connect.commit()
@@ -178,7 +169,7 @@ async def get_offer_last_chance(message: types.Message):
     cursor.execute(f"UPDATE users SET mark6 =  mark6 + 1 WHERE user_id = {message.from_user.id}")
     connect.commit()
     await send_msg_to_admins(message, 'пришел последний "шанс"')
-    msg = await message.answer(LEXICON_RU['msg_last_chance_kb'])
+    msg = await message.answer(LEXICON_RU['msg_last_chance_kb'], reply_markup=ReplyKeyboardRemove())
     asyncio.create_task(delete_message(msg, 3300/100)) # 58 минут
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
@@ -188,7 +179,7 @@ async def get_offer_five_reasons(message: types.Message):
     cursor.execute(f"UPDATE users SET mark5 =  mark5 + 1 WHERE user_id = {message.from_user.id}")
     connect.commit()
     await send_msg_to_admins(message, 'получил ссылку "5 причин..."')
-    msg = await message.answer(LEXICON_RU['msg_5_reasons_kb'])
+    msg = await message.answer(LEXICON_RU['msg_5_reasons_kb'], reply_markup=ReplyKeyboardRemove())
     asyncio.create_task(delete_message(msg, 18000/100)) # 5 часов
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
@@ -198,7 +189,7 @@ async def get_offer_after_artist_should_know(message: types.Message):
     cursor.execute(f"UPDATE users SET mark3 =  mark3 + 1 WHERE user_id = {message.from_user.id}")
     connect.commit()
     await send_msg_to_admins(message, 'получил ссылку "Каждый артист.."')
-    msg = await message.answer(LEXICON_RU['msg_artist_should_know_kb'])
+    msg = await message.answer(LEXICON_RU['msg_artist_should_know_kb'], reply_markup=ReplyKeyboardRemove())
     asyncio.create_task(delete_message(msg, 21600/100)) # 6 часов
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
@@ -208,7 +199,7 @@ async def get_offer_after_artist_should_know(message: types.Message):
     cursor.execute(f"UPDATE users SET mark4 =  mark4 + 1 WHERE user_id = {message.from_user.id}")
     connect.commit()
     await send_msg_to_admins(message, 'получил ссылку "Ошибка номер 1"')
-    msg = await message.answer(LEXICON_RU['msg_error_num1_offer_kb'])
+    msg = await message.answer(LEXICON_RU['msg_error_num1_offer_kb'], reply_markup=ReplyKeyboardRemove())
     asyncio.create_task(delete_message(msg, 21600/100)) # 6 часов
     await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
