@@ -144,7 +144,7 @@ async def wait_until(hour, min):
 
 async def send_two_day_msgs(message: types.Message):
     if await check_bot_state(message):
-        await wait_until(7, 45) # 11 30
+        await wait_until(10, 55) # 11 30
         msg_artist_should_know = await message.answer(LEXICON_RU['msg_artist_should_know'],
                                                       reply_markup=await create_kb('Перестать пахать за копейки🤑'))
         asyncio.create_task(delete_message(msg_artist_should_know, 21600/100))  # 6 часов
@@ -165,7 +165,7 @@ async def send_two_day_msgs(message: types.Message):
         await asyncio.sleep(10800/100+5)  # 3 часа
 
     if await check_bot_state(message):
-        await wait_until(7, 30) # 12 30
+        await wait_until(11, 30) # 12 30
         msg_error_num1_offer = await message.answer(LEXICON_RU['msg_error_num1_offer'],
                                                     reply_markup=await create_kb('Присоединиться к клубу 🔥'))
         asyncio.create_task(delete_message(msg_error_num1_offer, 21600/100))  # 6 часов
