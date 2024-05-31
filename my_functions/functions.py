@@ -47,9 +47,8 @@ async def send_message_to_user(user_id: int, message: str):
     await bot.send_message(user_id, message)
 
 async def send_msg_to_admins(message, msg):
-    await bot.send_message(1372933011, f'{"@" + message.from_user.username} - {msg}')
-    #await bot.send_message(1088508317, f'{"@" + message.from_user.username} - {msg}')
-    #await bot.send_message(364640169, f'{"@" + message.from_user.username} - {msg}')
+    await bot.send_message(user_id=-1002191031861, text=f'{"@" + message.from_user.username} - {msg}')
+
 
 # Функция для отправки PDF файла
 async def send_pdf(chat_id: int, pdf_path: str, bot_token: str):
@@ -75,7 +74,7 @@ async def convert_db_to_csv():
         csv_writer.writerows(rows)
 async def send_message_on_time(message: types.Message, msg, seconds, second_to_del, kb=None, parse_mode=None):
     current_time = datetime.datetime.now()
-    if current_time.hour >= 10 and current_time.hour < 23:
+    if current_time.hour >= 7 and current_time.hour < 20:
         delta = datetime.timedelta(seconds=seconds) #
         send_time = current_time + delta
     else:
@@ -85,20 +84,6 @@ async def send_message_on_time(message: types.Message, msg, seconds, second_to_d
     await asyncio.sleep(time_diff)
     msg1 = await message.answer(msg, reply_markup=kb, parse_mode=parse_mode)
     asyncio.create_task(delete_message(msg1, second_to_del))
-
-async def send_photo_on_time(message: types.Message, photo, cap, seconds, seconds_to_del, parse_mode):
-    current_time = datetime.datetime.now()
-
-    if current_time.hour >= 10 and current_time.hour < 23:
-        delta = datetime.timedelta(seconds=seconds) #
-        send_time = current_time + delta
-    else:
-        send_time = current_time.replace(hour=10, minute=0, second=0) + datetime.timedelta(days=1)
-
-    time_diff = (send_time - current_time).total_seconds()
-    await asyncio.sleep(time_diff)
-    msg1 = await message.answer_photo(photo=photo, caption=cap, parse_mode=parse_mode)
-    asyncio.create_task(delete_message(msg1, seconds_to_del))
 
 async def send_kb_yes_no(message: types.Message):
     button_yes = KeyboardButton(text='Да✅')
@@ -122,12 +107,6 @@ async def create_kb(button):
         one_time_keyboard=True
     )
     return kb
-
-
-# async def wait_until(hour, minute):
-#     target_time = datetime.time(hour, minute)
-#     while datetime.datetime.now().time() < target_time:
-#         await asyncio.sleep(60)
 
 async def wait_until(hour, min):
     current_time = datetime.datetime.now().time()
@@ -181,5 +160,5 @@ async def send_two_day_msgs(message: types.Message):
     if await check_bot_state(message):
         msg_last_chance = await message.answer(LEXICON_RU['msg_last_chance'],
                                                reply_markup=await create_kb('приобрести участие'))
-        asyncio.create_task(delete_message(msg_last_chance, 3600))  # 59минут
+        asyncio.create_task(delete_message(msg_last_chance, 3540))  # 59минут
 

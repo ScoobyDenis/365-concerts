@@ -31,7 +31,7 @@ async def cmd_start(message: types.Message):
 
         await asyncio.sleep(300) # 5 min
         msg2_youtube = await message.answer(LEXICON_RU['msg2_youtube'], reply_markup=await create_kb('Получить запись'))
-        asyncio.create_task(delete_message(msg2_youtube, 14400/100-100))  # 4 часа
+        asyncio.create_task(delete_message(msg2_youtube, 14400))  # 4 часа
 
         offer_1_pic = FSInputFile("files/offer_1.jpg")
 
@@ -241,6 +241,11 @@ async def cmd_club_react(message: types.Message):
             asyncio.create_task(delete_message(msg_not_open, 3600))  # 1час
 
             await send_two_day_msgs(message)
+
+@router.message(F.text.len() > 15)
+async def all_msgs_react(message: types.Message):
+    text = "написал:" + " '" + message.text + "'"
+    await send_msg_to_admins(message, text)
 
 
 
