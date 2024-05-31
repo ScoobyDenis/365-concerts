@@ -242,10 +242,10 @@ async def cmd_club_react(message: types.Message):
 
             await send_two_day_msgs(message)
 
-@router.message(F.text.len() > 15)
-async def all_msgs_react(message: types.Message):
-    text = "написал:" + " '" + message.text + "'"
-    await send_msg_to_admins(message, text)
+# @router.message(F.text.len() > 15)
+# async def all_msgs_react(message: types.Message):
+#     text = "написал:" + " '" + message.text + "'"
+#     await send_msg_to_admins(message, text)
 
 
 

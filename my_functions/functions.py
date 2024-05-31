@@ -47,7 +47,10 @@ async def send_message_to_user(user_id: int, message: str):
     await bot.send_message(user_id, message)
 
 async def send_msg_to_admins(message, msg):
-    await bot.send_message(user_id=-1002191031861, text=f'{"@" + message.from_user.username} - {msg}')
+    try:
+        await bot.send_message(user_id=-1002191031861, text=f'{"@" + message.from_user.username} - {msg}')
+    except Exception as e:
+        print(f"Ошибка при отправке сообщения: {e}")
 
 
 # Функция для отправки PDF файла
